@@ -12,6 +12,7 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import { saveAs } from 'file-saver';
 import { aiService } from '@/lib/ai-service';
+import { DataPreview } from './DataPreview';
 
 interface DataCleaningProps {
   data: any[];
@@ -728,6 +729,10 @@ export const DataCleaning = ({ data, onDataCleaned }: DataCleaningProps) => {
 
   return (
     <div className="space-y-6 px-2 sm:px-0">
+      {cleanedData.length > 0 && (
+        <DataPreview data={cleanedData} title="Cleaned Data Preview" />
+      )}
+
       <Card className="floating-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-lg sm:text-2xl">

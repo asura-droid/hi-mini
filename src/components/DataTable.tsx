@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
@@ -7,11 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { Search, Filter, Download, TrendingUp, ChevronDown } from 'lucide-react';
+import { Search, Filter, Download, TrendingUp, ChevronDown, FileText, Table as TableIcon } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import { saveAs } from 'file-saver';
+import { DataPreview } from './DataPreview';
 
 interface DataTableProps {
   data: any[];
@@ -268,48 +270,63 @@ export const DataTable = ({ data, filename, type }: DataTableProps) => {
   }
 
   return (
-    <Card className="glass-card p-3 sm:p-6 space-y-4 sm:space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <h3 className="text-base sm:text-xl font-semibold flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-chart-primary" />
-            <span className="truncate">{filename}</span>
-          </h3>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            {data.length} rows, {columns.length} columns • Type: {type.toUpperCase()}
-          </p>
+    <div className="space-y-6">
+      <Card className="glass-card p-3 sm:p-6 space-y-4 sm:space-y-6 animate-fade-in">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base sm:text-xl font-semibold flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-chart-primary" />
+              <span className="truncate">{filename}</span>
+            </h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              {data.length} rows, {columns.length} columns • Type: {type.toUpperCase()}
+            </p>
+          </div>
+
+          <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="glass" size="sm">
+                  <Download className="h-4 w-4" />
+                  <span className="ml-2">Export</span>
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={handleExportCSV}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export as CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportExcel}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export as Excel
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportPDF}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export as PDF
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportTXT}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export as TXT
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-        
-        <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="glass" size="sm">
-                <Download className="h-4 w-4" />
-                <span className="ml-2">Export</span>
-                <ChevronDown className="h-4 w-4 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={handleExportCSV}>
-                <Download className="h-4 w-4 mr-2" />
-                Export as CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportExcel}>
-                <Download className="h-4 w-4 mr-2" />
-                Export as Excel
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportPDF}>
-                <Download className="h-4 w-4 mr-2" />
-                Export as PDF
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportTXT}>
-                <Download className="h-4 w-4 mr-2" />
-                Export as TXT
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+
+        <Tabs defaultValue="table" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="table" className="flex items-center gap-2">
+              <TableIcon className="h-4 w-4" />
+              Table View
+            </TabsTrigger>
+            <TabsTrigger value="preview" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Text Preview
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="table" className="space-y-4 mt-4">
 
       <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
         <div className="relative flex-1 max-w-sm">
@@ -460,6 +477,13 @@ export const DataTable = ({ data, filename, type }: DataTableProps) => {
           </div>
         </div>
       )}
-    </Card>
+          </TabsContent>
+
+          <TabsContent value="preview" className="mt-4">
+            <DataPreview data={data} title="Data Preview" />
+          </TabsContent>
+        </Tabs>
+      </Card>
+    </div>
   );
 };

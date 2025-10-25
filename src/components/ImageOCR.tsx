@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Eye, FileText, Download, Loader2, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Eye, FileText, Download, Loader2, Sparkles, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,7 +21,32 @@ export const ImageOCR = ({ imageFile, onTextExtracted }: ImageOCRProps) => {
   const [progress, setProgress] = useState(0);
   const [imagePreview, setImagePreview] = useState<string>('');
   const [isEnhancing, setIsEnhancing] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (extractedText) {
+      copyToClipboard(extractedText);
+    }
+  }, [extractedText]);
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast({
+        title: "Copied to clipboard",
+        description: "Extracted text has been copied automatically",
+      });
+    } catch (error) {
+      console.error('Failed to copy:', error);
+    }
+  };
+
+  const handleManualCopy = () => {
+    copyToClipboard(extractedText);
+  };
 
   // AI-enhanced text completion and correction
   const enhanceTextWithAI = (rawText: string): string => {
@@ -480,34 +505,54 @@ export const ImageOCR = ({ imageFile, onTextExtracted }: ImageOCRProps) => {
                 <Sparkles className="h-4 w-4 text-chart-primary" />
                 AI-Enhanced Text
               </h4>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={downloadTextAsTXT}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Download as TXT
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={downloadTextAsPDF}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Download as PDF
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={downloadTextAsCSV}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Download as CSV
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleManualCopy}
+                  className="gap-2"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-4 w-4 text-green-500" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4" />
+                      Copy
+                    </>
+                  )}
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={downloadTextAsTXT}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download as TXT
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={downloadTextAsPDF}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download as PDF
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={downloadTextAsCSV}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download as CSV
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
             
             <Textarea
               value={extractedText}
               onChange={(e) => setExtractedText(e.target.value)}
-              className="min-h-[200px] font-mono text-sm"
+              className="min-h-[300px] font-mono text-sm whitespace-pre resize-y"
               placeholder="Extracted text will appear here..."
             />
             

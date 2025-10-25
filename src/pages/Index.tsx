@@ -5,9 +5,8 @@ import { FileUpload } from '@/components/FileUpload';
 import { DataTable } from '@/components/DataTable';
 import { DataCleaning } from '@/components/DataCleaning';
 import { ImageOCR } from '@/components/ImageOCR';
-import { AIChat } from '@/components/AIChat';
 import { Card } from '@/components/ui/card';
-import { Database, Image, Sparkles, MessageSquare, BarChart3 } from 'lucide-react';
+import { Database, Image, Sparkles, BarChart3 } from 'lucide-react';
 
 const Index = () => {
   const [data, setData] = useState<any[]>([]);
@@ -44,8 +43,6 @@ const Index = () => {
 
   const handleDataCleaned = (cleanedData: any[]) => {
     setData(cleanedData);
-    // Auto-navigate to AI chat after cleaning
-    setActiveTab('ai');
   };
 
   return (
@@ -61,7 +58,7 @@ const Index = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="flex w-full justify-center items-center gap-2 sm:grid sm:grid-cols-5 mb-8 h-auto py-2 px-2">
+          <TabsList className="flex w-full justify-center items-center gap-2 sm:grid sm:grid-cols-4 mb-8 h-auto py-2 px-2">
             <TabsTrigger value="upload" className="flex items-center gap-2">
               <Database className="h-5 w-5 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Upload</span>
@@ -77,10 +74,6 @@ const Index = () => {
             <TabsTrigger value="ocr" className="flex items-center gap-2">
               <Image className="h-5 w-5 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">OCR</span>
-            </TabsTrigger>
-            <TabsTrigger value="ai" disabled={data.length === 0} className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">AI Chat</span>
             </TabsTrigger>
           </TabsList>
 
@@ -110,16 +103,6 @@ const Index = () => {
 
           <TabsContent value="ocr" className="space-y-6">
             <ImageOCR imageFile={imageFile} onTextExtracted={handleTextExtracted} />
-          </TabsContent>
-
-          <TabsContent value="ai" className="space-y-6">
-            {data.length > 0 ? (
-              <AIChat data={data} filename={filename} />
-            ) : (
-              <Card className="glass-card p-8 text-center">
-                <p className="text-muted-foreground">No data for AI analysis. Please upload a file first.</p>
-              </Card>
-            )}
           </TabsContent>
         </Tabs>
       </div>

@@ -9,9 +9,6 @@ const Landing = () => {
     navigate('/app');
   };
 
-  const handleTryAIAssistant = () => {
-    navigate('/app');
-  };
 
   const handleUploadFiles = () => {
     navigate('/app');
@@ -46,20 +43,12 @@ const Landing = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
+              <Button
                 onClick={handleStartAnalyzing}
                 className="bg-gradient-to-r from-chart-primary to-chart-secondary hover:opacity-90 text-primary-foreground px-8 h-11"
               >
                 <Zap className="w-5 h-5 mr-2" />
                 Start Analyzing
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={handleTryAIAssistant}
-                className="glass-card border-border/50 backdrop-blur-md px-8 h-11"
-              >
-                <Brain className="w-5 h-5 mr-2" />
-                Try AI Assistant
               </Button>
             </div>
           </div>
